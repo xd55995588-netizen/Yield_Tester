@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #1c1c1e;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+  }
+  .card {
+    background: #1c1c1e;
+    width: 340px;
+    padding: 28px 24px 32px;
+    border-radius: 40px;
+  }
+  @media (max-width: 400px) {
+    .card { width: 92vw; padding: 24px 20px 28px; }
+    .display-value { font-size: 44px; }
+    .step-btn { width: 52px; height: 54px; font-size: 22px; }
+    select, input.vol-input, .stepper-row input { font-size: 16px; padding: 16px; }
+  }
+  .title {
+    color: #fff;
+    font-size: 22px;
+    font-size: 17px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 24px;
+    letter-spacing: 0.3px;
+  }
+  .display {
+    background: #2c2c2e;
+    border-radius: 20px;
+    padding: 18px 22px;
+    margin-bottom: 20px;
+    text-align: right;
+  }
+  .display-label {
+    color: #8e8e93;
+    font-size: 12px;
+    margin-bottom: 6px;
+    text-align: left;
+  }
+  .display-value {
+    font-size: 52px;
+    font-weight: 300;
+    color: #ff9f0a;
+    line-height: 1;
+    letter-spacing: -1px;
+    min-height: 52px;
+  }
+  .display-unit {
+    color: #8e8e93;
+    font-size: 16px;
+    margin-top: 4px;
+  }
+  .formula-text {
+    color: #636366;
+    font-size: 11px;
+    margin-top: 8px;
+    text-align: right;
+    min-height: 14px;
+  }
+  .fields { display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px; }
+  .field-label { color: #8e8e93; font-size: 12px; margin-bottom: 5px; }
+  select {
+    width: 100%;
+    background: #2c2c2e;
+    color: #fff;
+    border: none;
+    border-radius: 14px;
+    padding: 14px 16px;
+    font-size: 17px;
+    font-family: inherit;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238e8e93' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    cursor: pointer;
+    outline: none;
+  }
+  select option { background: #2c2c2e; }
+  .stepper-row {
+    display: flex;
+    align-items: center;
+    background: #2c2c2e;
+    border-radius: 14px;
+    overflow: hidden;
+  }
+  .stepper-row input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 17px;
+    font-family: inherit;
+    padding: 14px 16px;
+    outline: none;
+    min-width: 0;
+    text-align: center;
+    -moz-appearance: textfield;
+  }
+  .stepper-row input::-webkit-inner-spin-button,
+  .stepper-row input::-webkit-outer-spin-button { -webkit-appearance: none; }
+  .step-btn {
+    width: 44px;
+    height: 50px;
+    background: #3a3a3c;
+    border: none;
+    color: #fff;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.1s;
+  }
+  .step-btn:active { background: #ff9f0a; }
+  .step-btn.minus { border-right: 1px solid #2c2c2e; }
+  .step-btn.plus  { border-left:  1px solid #2c2c2e; }
+  input.vol-input {
+    width: 100%;
+    background: #2c2c2e;
+    border: none;
+    border-radius: 14px;
+    color: #fff;
+    font-size: 17px;
+    font-family: inherit;
+    padding: 14px 16px;
+    outline: none;
+    -moz-appearance: textfield;
+  }
+  input.vol-input::-webkit-inner-spin-button,
+  input.vol-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+  input.vol-input::placeholder { color: #48484a; }
+  .disclaimer { color: #636366; font-size: 11px; text-align: center; margin-top: 16px; }
+  select:disabled { opacity: 0.4; cursor: not-allowed; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="title">生產量計算機（頭髮類化粧品）</div>
+  <div class="display">
+    <div class="display-label">每批理論產出</div>
+    <div class="display-value" id="output"></div>
+    <div class="display-unit" id="output-unit"></div>
+    <div class="formula-text" id="formula"></div>
+  </div>
+  <div class="fields">
+    <div>
+      <div class="field-label">類別</div>
+      <select id="category" onchange="onCategoryChange()">
+        <option value="">請選擇類別</option>
+        <option value="洗髮精">洗髮精</option>
+        <option value="凝膠">凝膠</option>
+        <option value="慕斯">慕斯</option>
+        <option value="泥膜">泥膜</option>
+        <option value="潤髮乳">潤髮乳</option>
+        <option value="髮油">髮油</option>
+        <option value="頭皮舒緩液">頭皮舒緩液</option>
+        <option value="頭皮營養液">頭皮營養液</option>
+        <option value="生髮液">生髮液</option>
+      </select>
+    </div>
+    <div>
+      <div class="field-label">半成品批量（Kg）</div>
+      <select id="batch" onchange="calc()" disabled>
+        <option value="">請先選擇類別</option>
+      </select>
+    </div>
+    <div>
+      <div class="field-label">密度（g/mL）</div>
+      <div class="stepper-row">
+        <button class="step-btn minus" onclick="stepDensity(-1)">−</button>
+        <input type="number" id="density" value="1.00" onkeydown="handleDensityKey(event)" oninput="calc()" />
+        <button class="step-btn plus" onclick="stepDensity(1)">+</button>
+      </div>
+    </div>
+    <div>
+      <div class="field-label">產品容量（mL）</div>
+      <input class="vol-input" type="number" id="volume" placeholder="例：200" min="0" step="any" oninput="calc()" />
+    </div>
+  </div>
+  <div class="error" id="error"></div>
+  <div class="disclaimer">僅供參考，實際情況請與負責同仁確認</div>
+</div>
+<script>
+const categoryBatches = {
+  '洗髮精': [510, 1000],
+  '凝膠':   [50, 100, 200],
+  '慕斯':   [510, 1000],
+  '泥膜':   [100],
+  '潤髮乳': [100],
+  '髮油':   [24, 30, 50, 100],
+  '頭皮舒緩液': [50, 100, 200],
+  '頭皮營養液': [24, 30, 100],
+  '生髮液': [50, 100],
+};
+
+function onCategoryChange() {
+  const cat = document.getElementById('category').value;
+  const batchSel = document.getElementById('batch');
+  batchSel.innerHTML = '';
+  if (!cat) {
+    batchSel.innerHTML = '<option value="">請先選擇類別</option>';
+    batchSel.disabled = true;
+  } else {
+    batchSel.innerHTML = '<option value="">請選擇批量</option>';
+    categoryBatches[cat].forEach(v => {
+      const opt = document.createElement('option');
+      opt.value = v;
+      opt.textContent = v + ' Kg';
+      batchSel.appendChild(opt);
+    });
+    batchSel.disabled = false;
+  }
+  calc();
+}
+function stepDensity(dir) {
+  const el = document.getElementById('density');
+  const cur = parseFloat(el.value);
+  el.value = isNaN(cur) ? (1).toFixed(2) : Math.max(0, cur + dir * 0.01).toFixed(2);
+  calc();
+}
+function handleDensityKey(e) {
+  if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+    e.preventDefault();
+    stepDensity(e.key === 'ArrowUp' ? 1 : -1);
+  }
+}
+function calc() {
+  const batch = parseFloat(document.getElementById('batch').value);
+  const density = parseFloat(document.getElementById('density').value);
+  const volume = parseFloat(document.getElementById('volume').value);
+  const out = document.getElementById('output');
+  const outUnit = document.getElementById('output-unit');
+  const formula = document.getElementById('formula');
+  const error = document.getElementById('error');
+  error.textContent = '';
+  if (isNaN(batch) || isNaN(density) || isNaN(volume)) {
+    out.textContent = '';
+    outUnit.textContent = '';
+    formula.textContent = '';
+    return;
+  }
+  if (density <= 0 || volume <= 0) {
+    error.textContent = '密度與容量必須大於 0';
+    out.textContent = '';
+    outUnit.textContent = '';
+    return;
+  }
+  const result = Math.floor((batch * 1000) / density / volume);
+  out.textContent = result.toLocaleString();
+  outUnit.textContent = 'pcs';
+  formula.textContent = `${batch} × 1000 ÷ ${density} ÷ ${volume} = ${result.toLocaleString()}`;
+}
+</script>
+</body>
+</html>
