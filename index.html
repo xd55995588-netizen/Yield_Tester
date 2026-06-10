@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
@@ -122,6 +122,8 @@
     justify-content: center;
     flex-shrink: 0;
     transition: background 0.1s;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
   }
   .step-btn:active { background: #ff9f0a; }
   .step-btn.minus { border-right: 1px solid #2c2c2e; }
